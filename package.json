@@ -1,0 +1,24 @@
+{
+  "name": "response-dump",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Rafał Kuć <qc.rafal@gmail.com>",
+  "bin": {
+    "response-dump": "./bin/response-dump"
+  },
+  "dependencies": {
+    "debug": "~2.1.1",
+    "diff": "^2.0.2",
+    "liftoff": "^2.1.0",
+    "lodash": "^3.10.1",
+    "node-rest-client": "~1.5.0",
+    "optimist": "^0.6.1",
+    "path": "^0.11.14",
+    "q": "^1.4.1",
+    "v8flags": "^2.0.10"
+  },
+  "engines": {
+    "node": ">=0.8 <=0.12 || >=1 <=2"
+  },
+  "license": "MIT"
+}
