@@ -2,7 +2,7 @@
 var fs = require('fs-extra');
 var Q = require('q');
 var jsDiff = require('diff');
-var _process = process;
+
 var Dumper = function Dumper(options) {
     this.base_path = options.base_path;
     this.tmp_base_path = options.tmp_base_path;
@@ -31,7 +31,7 @@ var Dumper = function Dumper(options) {
                 // grey for common parts
                 var color = part.added ? 'green' :
                     part.removed ? 'red' : 'grey';
-                console.warn(part);
+
             });
         } else {
             fs.writeFileSync(file, content);

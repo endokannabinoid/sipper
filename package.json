@@ -1,22 +1,32 @@
 {
-  "name": "response-dump",
+  "name": "sipper",
   "version": "0.0.1",
-  "description": "",
-  "author": "Rafał Kuć <qc.rafal@gmail.com>",
+  "description": "Simple REST API cwarler with diff tool",
+  "author": {
+    "name": "Rafał Kuć",
+    "email": "qc.rafal@gmail.com",
+    "url": "https://github.com/QcRafal"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QcRafal/sipper.git"
+  },
+  "main": "src/index.js",
   "bin": {
-    "response-dump": "./bin/response-dump"
+    "sipper": "./bin/sipper"
   },
   "dependencies": {
-    "debug": "~2.1.1",
     "diff": "^2.0.2",
-    "liftoff": "^2.1.0",
+    "fs-extra": "^0.23.1",
     "lodash": "^3.10.1",
     "node-rest-client": "~1.5.0",
     "optimist": "^0.6.1",
-    "path": "^0.11.14",
-    "q": "^1.4.1",
-    "v8flags": "^2.0.10"
+    "q": "^1.4.1"
   },
+  "bugs": {
+    "url": "https://github.com/QcRafal/sipper/issues"
+  },
+  "homepage": "https://github.com/QcRafal/sipper",
   "engines": {
     "node": ">=0.8 <=0.12 || >=1 <=2"
   },
