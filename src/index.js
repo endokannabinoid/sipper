@@ -38,8 +38,7 @@ var processArgs = function (argv, options, fs, path) {
     if (options.requests.length === 0 && _.has(options, ['url', 'method'])) {
         var request = {
             method: options.method,
-            base_url: helper.urlRoot(options.url),
-            url_path: helper.trimUrlRoot(options.url, options.base_url),
+            base_url: options.base_url,
         };
 
         options.requests.push(request);
@@ -74,8 +73,6 @@ var processArgs = function (argv, options, fs, path) {
         return request;
     });
 
-    console.log(options);
-    process.exit(1);
     return options
 };
 
@@ -92,7 +89,6 @@ exports.process = function () {
         console.log('HTTP Method must be specified!');
         optimist.showHelp();
         process.exit(1)
-
 
         switch (options.method.toUpperCase()) {
             case 'GET':
@@ -148,18 +144,19 @@ var __call = function (method, config) {
         tmp_base_path: config.tmp_base_path,
         force: config.force
     });
+    var _method = method !== 'head' ? method : 'get';
 
-    client[method](request.url, request.args)
+    client[_method](config.url, config.args)
         .then(function (result) {
             dumper.dump(
-                request.file.replace(
-                    helper.extname(request.file),
-                    '.headers' + helper.extname(request.file)
+                config.file.replace(
+                    helper.extname(config.file),
+                    '.headers' + helper.extname(config.file)
                 ),
                 result.response.headers
             );
             if (method !== 'head') {
-                dumper.dump(request.file, result.data);
+                dumper.dump(config.file, result.data);
             }
         });
 }
