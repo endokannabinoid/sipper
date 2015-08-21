@@ -7,132 +7,6 @@ var path = require('path');
 var fs = require('fs-extra');
 var helper = require('./util/helper');
 
-exports.get = function (config) {
-    var client = new Client();
-    var dumper = new Dumper({
-        base_path: config.base_path,
-        tmp_base_path: config.tmp_base_path,
-        force: config.force
-    });
-
-    client
-        .get(config.url, config.args)
-        .then(function (result) {
-
-            dumper.dump(
-                config.file.replace(
-                    helper.extname(config.file),
-                    '.headers' + helper.extname(config.file)
-                ),
-                result.response.headers
-            );
-            dumper.dump(config.file, result.data);
-        });
-};
-exports.post = function (config) {
-    var client = new Client();
-    var dumper = new Dumper({
-        base_path: config.base_path,
-        tmp_base_path: config.tmp_base_path,
-        force: config.force
-    });
-
-    client
-        .post(config.url, config.args)
-        .then(function (result) {
-            dumper.dump(
-                config.file.replace(
-                    helper.extname(config.file),
-                    '.headers' + helper.extname(config.file)
-                ),
-                result.response.headers
-            );
-            dumper.dump(config.file, result.data);
-        });
-};
-exports.patch = function (config) {
-    var client = new Client();
-    var dumper = new Dumper({
-        base_path: config.base_path,
-        tmp_base_path: config.tmp_base_path,
-        force: config.force
-    });
-
-    client
-        .patch(config.url, config.args)
-        .then(function (result) {
-            dumper.dump(
-                config.file.replace(
-                    helper.extname(config.file),
-                    '.headers' + helper.extname(config.file)
-                ),
-                result.response.headers
-            );
-            dumper.dump(config.file, result.data);
-        });
-};
-exports.put = function (config) {
-    var client = new Client();
-    var dumper = new Dumper({
-        base_path: config.base_path,
-        tmp_base_path: config.tmp_base_path,
-        force: config.force
-    });
-
-    client
-        .put(config.url, config.args)
-        .then(function (result) {
-            dumper.dump(
-                config.file.replace(
-                    helper.extname(config.file),
-                    '.headers' + helper.extname(config.file)
-                ),
-                result.response.headers
-            );
-            dumper.dump(config.file, result.data);
-        });
-};
-exports.delete = function (config) {
-    var client = new Client();
-    var dumper = new Dumper({
-        base_path: config.base_path,
-        tmp_base_path: config.tmp_base_path,
-        force: config.force
-    });
-
-    client
-        .delete(config.url, config.args)
-        .then(function (result) {
-            dumper.dump(
-                config.file.replace(
-                    helper.extname(config.file),
-                    '.headers' + helper.extname(config.file)
-                ),
-                result.response.headers
-            );
-            dumper.dump(config.file, result.data);
-        });
-};
-exports.head = function (config) {
-    var client = new Client();
-    var dumper = new Dumper({
-        base_path: config.base_path,
-        tmp_base_path: config.tmp_base_path,
-        force: config.force
-    });
-
-    client
-        .get(config.url, config.args)
-        .then(function (result) {
-            dumper.dump(
-                config.file.replace(
-                    helper.extname(config.file),
-                    '.headers' + helper.extname(config.file)
-                ),
-                result.response.headers
-            );
-        });
-};
 
 var argsBeforeDoubleDash = function (argv) {
     var idx = argv.indexOf('--');
@@ -160,8 +34,8 @@ var processArgs = function (argv, options, fs, path) {
         }
     });
     //console.log();
-    options.base_path = path.resolve(path.relative(options.base_path || process.env.PWD, 'data/'+ options.cmd.toUpperCase()));
-    options.tmp_base_path = path.resolve(path.relative(options.tmp_base_path || process.env.PWD, '.tmp/'+ options.cmd.toUpperCase()));
+    options.base_path = path.resolve(path.relative(options.base_path || process.env.PWD, 'data/' + options.method.toUpperCase()));
+    options.tmp_base_path = path.resolve(path.relative(options.tmp_base_path || process.env.PWD, '.tmp/' + options.method.toUpperCase()));
 
     if (!options.base_url) {
         options.base_url = helper.urlRoot(options.url);
@@ -181,25 +55,22 @@ var processArgs = function (argv, options, fs, path) {
         options.file += '.json';
     }
 
-    helper.mkdirIfNotExists(options.base_path);
-    helper.mkdirIfNotExists(options.tmp_base_path);
-
     return options
 };
 
 exports.process = function () {
     var argv = optimist.parse(argsBeforeDoubleDash(process.argv.slice(2)));
     var options = {
-        cmd: argv._.shift()
+        method: argv._.shift()
     };
 
-    if (!options.cmd) {
+    if (!options.method) {
         console.log('HTTP Method must be specified!');
         optimist.showHelp();
         process.exit(1)
     }
 
-    switch (options.cmd.toUpperCase()) {
+    switch (options.method.toUpperCase()) {
         case 'GET':
             console.log('GET');
             break;
@@ -231,9 +102,16 @@ exports.process = function () {
 exports.run = function () {
     var config = exports.process();
 
+    exports.sip(config, function () {
+        process.exit(1);
+    })
+};
+
+exports.sip = function (config, done) {
+
     console.log(config);
 
-    switch (config.cmd.toUpperCase()) {
+    switch (config.method.toUpperCase()) {
         case 'GET':
             exports.get(config);
             break;
@@ -253,6 +131,139 @@ exports.run = function () {
             exports.delete(config);
             break;
         default:
+            process.exit(0);
             break;
     }
+    done();
+};
+
+exports.get = function (config) {
+    var client = new Client();
+    var dumper = new Dumper({
+        base_path: config.base_path,
+        tmp_base_path: config.tmp_base_path,
+        force: config.force
+    });
+
+    client
+        .get(config.url, config.args)
+        .then(function (result) {
+            dumper.dump(
+                config.file.replace(
+                    helper.extname(config.file),
+                    '.headers' + helper.extname(config.file)
+                ),
+                result.response.headers
+            );
+            dumper.dump(config.file, result.data);
+        });
+};
+
+exports.post = function (config) {
+    var client = new Client();
+    var dumper = new Dumper({
+        base_path: config.base_path,
+        tmp_base_path: config.tmp_base_path,
+        force: config.force
+    });
+
+    client
+        .post(config.url, config.args)
+        .then(function (result) {
+            dumper.dump(
+                config.file.replace(
+                    helper.extname(config.file),
+                    '.headers' + helper.extname(config.file)
+                ),
+                result.response.headers
+            );
+            dumper.dump(config.file, result.data);
+        });
+};
+
+exports.patch = function (config) {
+    var client = new Client();
+    var dumper = new Dumper({
+        base_path: config.base_path,
+        tmp_base_path: config.tmp_base_path,
+        force: config.force
+    });
+
+    client
+        .patch(config.url, config.args)
+        .then(function (result) {
+            dumper.dump(
+                config.file.replace(
+                    helper.extname(config.file),
+                    '.headers' + helper.extname(config.file)
+                ),
+                result.response.headers
+            );
+            dumper.dump(config.file, result.data);
+        });
+};
+
+exports.put = function (config) {
+    var client = new Client();
+    var dumper = new Dumper({
+        base_path: config.base_path,
+        tmp_base_path: config.tmp_base_path,
+        force: config.force
+    });
+
+    client
+        .put(config.url, config.args)
+        .then(function (result) {
+            dumper.dump(
+                config.file.replace(
+                    helper.extname(config.file),
+                    '.headers' + helper.extname(config.file)
+                ),
+                result.response.headers
+            );
+            dumper.dump(config.file, result.data);
+        });
+};
+
+exports.delete = function (config) {
+    var client = new Client();
+    var dumper = new Dumper({
+        base_path: config.base_path,
+        tmp_base_path: config.tmp_base_path,
+        force: config.force
+    });
+
+    client
+        .delete(config.url, config.args)
+        .then(function (result) {
+            dumper.dump(
+                config.file.replace(
+                    helper.extname(config.file),
+                    '.headers' + helper.extname(config.file)
+                ),
+                result.response.headers
+            );
+            dumper.dump(config.file, result.data);
+        });
+};
+
+exports.head = function (config) {
+    var client = new Client();
+    var dumper = new Dumper({
+        base_path: config.base_path,
+        tmp_base_path: config.tmp_base_path,
+        force: config.force
+    });
+
+    client
+        .get(config.url, config.args)
+        .then(function (result) {
+            dumper.dump(
+                config.file.replace(
+                    helper.extname(config.file),
+                    '.headers' + helper.extname(config.file)
+                ),
+                result.response.headers
+            );
+        });
 };
