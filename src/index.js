@@ -48,13 +48,13 @@ var processArgs = function (argv, options, fs, path) {
 
         request.base_path = path.resolve(
             request.base_path
-            || options.base_path + '/' + request.method.toUpperCase()
-            || path.relative(process.env.PWD, 'data/' + request.method.toUpperCase())
+            || options.base_path + '/' + request.method.toLowerCase()
+            || path.relative(process.env.PWD, 'data/' + request.method.toLowerCase())
         );
         request.tmp_base_path = path.resolve(
             request.tmp_base_path
-            || options.tmp_base_path + '/' + request.method.toUpperCase()
-            || path.relative(process.env.PWD, '.tmp/' + request.method.toUpperCase())
+            || options.tmp_base_path + '/' + request.method.toLowerCase()
+            || path.relative(process.env.PWD, '.tmp/' + request.method.toLowerCase())
         );
 
         if (!request.url && ( options.base_url && request.url_path )) {
@@ -123,12 +123,15 @@ exports.process = function () {
 exports.run = function () {
     var config = exports.process();
 
-    exports.sip(config, function () {
+    exports.sip(config, true, function () {
         process.exit(1);
     })
 };
 
-exports.sip = function (config, done) {
+exports.sip = function (config, console, done) {
+    if (!console) {
+        config = processArgs({}, require(path.resolve(config.configFile)), fs, path);
+    }
 
     _.forEach(config.requests, function (config) {
         __call(config.method.toLowerCase(), config);
@@ -144,7 +147,7 @@ var __call = function (method, config) {
         tmp_base_path: config.tmp_base_path,
         force: config.force
     });
-    var _method = method !== 'head' ? method : 'get';
+    var _method = (method !== 'head' ? method : 'get').toLowerCase();
 
     client[_method](config.url, config.args)
         .then(function (result) {
