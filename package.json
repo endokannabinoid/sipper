@@ -1,6 +1,6 @@
 {
   "name": "sipper",
-  "version": "0.0.3",
+  "version": "0.0.4-pre",
   "description": "Simple REST API cwarler with diff tool",
   "author": {
     "name": "Rafał Kuć",
