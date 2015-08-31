@@ -162,8 +162,9 @@ var __call = function (method, config) {
 
     client[_method](config.url, config.args)
         .then(function (result) {
-
-                  config.onResponse(cache, result.data, result.response);
+                  if (config.onResponse && _.isFunction(config.onResponse)) {
+                      config.onResponse(cache, result.data, result.response);
+                  }
 
                   dumper.dump(
                       config.file.replace(
